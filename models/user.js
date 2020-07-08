@@ -8,6 +8,20 @@ const userSchema = new Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true, minlength: 6 },
   image: { type: String, required: true },
+  grade: { type: String, required: true },
+  institution: { type: String, required: true },
+  country: { type: String, required: true },
+  city: { type: String, required: true },
+  labs: [
+    {
+      group: { type: String, required: true },
+      name: { type: String, required: true },
+      label: { type: String, required: true },
+      url: { type: String, required: true },
+      iconUrl: { type: String, required: true },
+      color: { type: String, required: true },
+    },
+  ],
 });
 
 userSchema.plugin(uniqueValidator);
