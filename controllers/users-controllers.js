@@ -97,7 +97,9 @@ const signup = async (req, res, next) => {
     return next(error);
   }
 
-  let userData = JSON.parse(JSON.stringify(createdUser));
+  let userData = JSON.parse(
+    JSON.stringify(createdUser.toObject({ getters: true }))
+  );
   delete userData.password;
 
   res.status(201).json({
@@ -164,7 +166,9 @@ const login = async (req, res, next) => {
     );
     return next(error);
   }
-  let userData = JSON.parse(JSON.stringify(existingUser));
+  let userData = JSON.parse(
+    JSON.stringify(existingUser.toObject({ getters: true }))
+  );
   delete userData.password;
 
   res.json({
@@ -173,6 +177,62 @@ const login = async (req, res, next) => {
   });
 };
 
+const updateUser = async (req, res, next) => {
+  const userId = req.params.id;
+
+  if (userId !== req.userData.userId) {
+    const error = new HttpError(
+      'You are not allowed to modify this element.',
+      401
+    );
+    return next(error);
+  }
+  let user;
+  try {
+    user = await User.findById(userId);
+  } catch (err) {
+    console.log(err);
+    const error = new HttpError(
+      'Something went wrong, could not update user.',
+      500
+    );
+    return next(error);
+  }
+
+  for (let property in req.body) {
+    user[property] = req.body[property];
+  }
+
+  if (req.body.password) {
+    let hashedPassword;
+    try {
+      hashedPassword = await bcrypt.hash(req.body.password, 12);
+    } catch (err) {
+      console.log(err);
+
+      const error = new HttpError(
+        'Could not create user,please try again.',
+        500
+      );
+      return next(error);
+    }
+    user.password = hashedPassword;
+  }
+  try {
+    await user.save();
+  } catch (err) {
+    console.log(err);
+
+    const error = new HttpError(
+      'Something went wrong, please try again later.',
+      500
+    );
+    return next(error);
+  }
+  res.json(user);
+};
+
 exports.getUsers = getUsers;
 exports.signup = signup;
 exports.login = login;
+exports.updateUser = updateUser;
