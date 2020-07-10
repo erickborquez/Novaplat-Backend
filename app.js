@@ -41,6 +41,12 @@ app.use((error, req, res, next) => {
   res.json({ message: error.message || 'An unknown error ocurred!' });
 });
 
+console.log('VARIABLES');
+console.log(process.env.DB_USER);
+console.log(process.env.DB_PASSWORD);
+console.log(process.env.DB_NAME);
+console.log(process.env.PORT);
+
 mongoose
   .set('useCreateIndex', true)
   .connect(
