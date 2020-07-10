@@ -204,11 +204,9 @@ const updateUser = async (req, res, next) => {
   }
 
   if (req.file) {
-    console.log('yey');
     user.image = req.file.path;
   }
 
-  console.log(user.image);
   if (req.body.password) {
     let hashedPassword;
     try {
