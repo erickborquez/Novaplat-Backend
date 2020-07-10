@@ -62,7 +62,7 @@ const signup = async (req, res, next) => {
   const createdUser = new User({
     name,
     email,
-    image: 'https://picsum.photos/200',
+    image: null,
     password: hashedPassword,
     country,
     city,
@@ -189,7 +189,7 @@ const updateUser = async (req, res, next) => {
   }
   let user;
   try {
-    user = await User.findById(userId);
+    user = await User.findById(userId, '-password');
   } catch (err) {
     console.log(err);
     const error = new HttpError(
@@ -203,13 +203,18 @@ const updateUser = async (req, res, next) => {
     user[property] = req.body[property];
   }
 
+  if (req.file) {
+    console.log('yey');
+    user.image = req.file.path;
+  }
+
+  console.log(user.image);
   if (req.body.password) {
     let hashedPassword;
     try {
       hashedPassword = await bcrypt.hash(req.body.password, 12);
     } catch (err) {
       console.log(err);
-
       const error = new HttpError(
         'Could not create user,please try again.',
         500
@@ -222,14 +227,13 @@ const updateUser = async (req, res, next) => {
     await user.save();
   } catch (err) {
     console.log(err);
-
     const error = new HttpError(
       'Something went wrong, please try again later.',
       500
     );
     return next(error);
   }
-  res.json(user);
+  res.json(user.toObject({ getters: true }));
 };
 
 exports.getUsers = getUsers;

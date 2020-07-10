@@ -2,6 +2,9 @@ const express = require('express');
 const router = express.Router();
 
 const { check } = require('express-validator');
+
+const fileUpload = require('../middlewares/file-upload');
+
 const {
   getUsers,
   signup,
@@ -26,6 +29,6 @@ router.post('/login', login);
 
 router.use(checkAuth);
 
-router.patch('/:id', updateUser);
+router.patch('/:id', fileUpload.single('image'), updateUser);
 
 module.exports = router;
