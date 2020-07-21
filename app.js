@@ -29,6 +29,10 @@ app.use((req, res, next) => {
 
 app.use('/api/users', userRoutes);
 
+app.use('/api/ping', (req, res) => {
+  res.send(`Active! ${Math.random()}`);
+});
+
 app.use((req, res, next) => {
   next(new HttpError('Could not find this route.', 404));
 });
